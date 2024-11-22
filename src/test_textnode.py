@@ -137,6 +137,11 @@ class SplitNodesDelimiter(unittest.TestCase):
             new_nodes,
         )
 
-
+    def test_unclosed_exception(self):
+        node = TextNode("This is text with a `code block word", TextType.TEXT)
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter([node], "`", TextType.CODE)
+            
+            
 if __name__ == "__main__":
     unittest.main()

@@ -48,8 +48,10 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             new_nodes.append(old_node)
             continue
         if delimiter not in old_node.text:
-            raise ValueError("Delimited not found in string")
+            raise ValueError("Delimited not found in string")      
         text = old_node.text.split(delimiter)
+        if len(text) % 2 == 0:
+            raise ValueError("Invalid markdown, formatted section not closed")
         text[::2] = [TextNode(x, TextType.TEXT) for x in text[::2]]
         text[1::2] = [TextNode(x, text_type) for x in text[1::2]]
         text = [x for x in text if x.text]
