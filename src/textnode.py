@@ -40,3 +40,19 @@ def text_node_to_html_node(text_node):
             return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
         case _:
             raise ValueError(f"Invalid text type: {text_node.text_type}")
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    new_nodes = []
+    for old_node in old_nodes:
+        if old_node.text_type is not TextType.TEXT:
+            new_nodes.append(old_node)
+            continue
+        if delimiter not in old_node.text:
+            raise ValueError("Delimited not found in string")
+        text = old_node.text.split(delimiter)
+        text[::2] = [TextNode(x, TextType.TEXT) for x in text[::2]]
+        text[1::2] = [TextNode(x, text_type) for x in text[1::2]]
+        text = [x for x in text if x.text]
+        new_nodes.extend(text)
+    return new_nodes
+        
