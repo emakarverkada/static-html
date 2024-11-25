@@ -26,6 +26,14 @@ class TextNode():
     def __repr__(self) -> str:
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
 
+def extract_markdown_images(text):
+    pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
+    return re.findall(pattern, text)
+
+def extract_markdown_links(text):
+    pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
+    return re.findall(pattern, text)
+
 def text_node_to_html_node(text_node):
     match text_node.text_type:
         case TextType.TEXT:
@@ -60,10 +68,28 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         new_nodes.extend(text)
     return new_nodes
 
-def extract_markdown_images(text):
-    pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
-    return re.findall(pattern, text)
+def split_nodes_image(old_nodes):
+    pattern = r"!(\[[^\[\]]*\]\([^\(\)]*\))"
+    new_nodes = []
+    for old_node in old_nodes:
+        if not re.findall(pattern,old_node.text):
+            raise ValueError("Image not found in string")
+        text = re.split(pattern, old_node.text)
+        text[::2] = [TextNode(x, TextType.TEXT) for x in text[::2]]
+        text[1::2] = [TextNode(re.findall(r"\[([^\[\]]*)\]\(([^\(\)]*)\)", x)[0][0], TextType.IMAGE, re.findall(r"\[([^\[\]]*)\]\(([^\(\)]*)\)", x)[0][1]) for x in text[1::2]]
+        text = [x for x in text if x.text]
+        new_nodes.extend(text)
+    return new_nodes
 
-def extract_markdown_links(text):
-    pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
-    return re.findall(pattern, text)
+def split_nodes_link(old_nodes):
+    pattern = r"(?<!!)(\[[^\[\]]*\]\([^\(\)]*\))"
+    new_nodes = []
+    for old_node in old_nodes:
+        if not re.findall(pattern,old_node.text):
+            raise ValueError("Image not found in string")
+        text = re.split(pattern, old_node.text)
+        text[::2] = [TextNode(x, TextType.TEXT) for x in text[::2]]
+        text[1::2] = [TextNode(re.findall(r"\[([^\[\]]*)\]\(([^\(\)]*)\)", x)[0][0], TextType.LINK, re.findall(r"\[([^\[\]]*)\]\(([^\(\)]*)\)", x)[0][1]) for x in text[1::2]]
+        text = [x for x in text if x.text]
+        new_nodes.extend(text)
+    return new_nodes
