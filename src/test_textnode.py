@@ -1,5 +1,6 @@
 import unittest
 from textnode import *
+from markdown import *
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
