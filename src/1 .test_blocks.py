@@ -1,5 +1,6 @@
 import unittest
-from textnode import markdown_to_blocks
+from textnode import *
+from markdown import *
 
 
 class TestMarkdownToHTML(unittest.TestCase):

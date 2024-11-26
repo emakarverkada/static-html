@@ -34,3 +34,45 @@ def block_to_block_type(text):
         return BlockType.OLIST
     else:
         return BlockType.PARAGRAPH
+
+def block_to_children(text, block_type):
+    text = text.split("\n")
+    match block_type:
+        case BlockType.PARAGRAPH:
+            pass
+        case BlockType.HEADING:
+            pass
+        case BlockType.QUOTE:
+            pass
+        case BlockType.CODE:
+            pass
+        case BlockType.UNLIST:
+            pass
+        case BlockType.OLIST:
+           #parse through every line and remove the identifiers (numbers maybe using regex)
+           # and make child nodes of type li
+           #create parent html node of the type ol 
+           #append to results
+           #text_to_html(text)
+    
+
+#def markdown_to_html_node(text):
+#    text = markdown_to_blocks(text)
+#    nodes = []
+#    for block in text:
+#        block_type = block_to_block_type(block)
+#        match block_type:
+#            case BlockType.PARAGRAPH:
+#                nodes.append(HTMLNode("p",block))
+#            case BlockType.HEADING:
+#                nodes.append(HTMLNode(f"h{block[5].count("#")}",block.split(f"{block[5].count("#")}").join("")))
+#            case BlockType.QUOTE:
+#                nodes.append(HTMLNode("blockquote", block.split(">").join("")))
+#            case BlockType.CODE:
+#                nodes.append(HTMLNode("code", block.strip("```")))
+#            case BlockType.UNLIST:
+#                child_nodes = [LeafNode("li", node) for node in nodes.split("\n")]
+#                nodes.append(ParentNode("ul", child_nodes))
+#            case BlockType.OLIST:
+#                child_nodes = [LeafNode("li", node) for node in nodes.split("\n")]
+#                nodes.append(ParentNode("ol", child_nodes))

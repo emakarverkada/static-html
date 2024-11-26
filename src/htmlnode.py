@@ -34,9 +34,6 @@ class LeafNode(HTMLNode):
     def __repr__(self):
         return f"LeafNode({self.tag}, {self.value}, {self.props})"
     
-
-    
-    
 class ParentNode(HTMLNode):
     #no value, only tag, children, and properties
     def __init__(self, tag, children, props=None) -> None:
