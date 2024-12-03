@@ -40,6 +40,7 @@ def block_to_html(block, block_type):
     #text = block
     match block_type:
         case BlockType.PARAGRAPH:
+            raw_lines = text
             return [ParentNode("p", lines_to_html_nodes([l])) for l in raw_lines]
         case BlockType.HEADING:
             n = text[0].split(" ")[0].count("#")
@@ -76,16 +77,17 @@ def markdown_to_html_node(text):
         block_type = block_to_block_type(block)
         match block_type:
             case BlockType.PARAGRAPH:
-                nodes.append(HTMLNode("p",block))
+                nodes.append(ParentNode("p",children=block_to_html(block, block_type)))
             case BlockType.HEADING:
-                nodes.append(HTMLNode(f"h{block[5].count("#")}",block.split(f"{block[5].count("#")}").join("")))
+                nodes.append(ParentNode(f"h{block[5].count("#")}",children=block_to_html(block, block_type)))
             case BlockType.QUOTE:
-                nodes.append(HTMLNode("blockquote", block.split(">").join("")))
+                nodes.append(ParentNode("blockquote", children=block_to_html(block, block_type)))
             case BlockType.CODE:
-                nodes.append(HTMLNode("code", block.strip("```")))
+                nodes.append(HTMLNode("code", children=block_to_html(block, block_type)))
             case BlockType.UNLIST:
-                child_nodes = [LeafNode("li", node) for node in nodes.split("\n")]
+                child_nodes = [LeafNode("li", node) for node in block_to_html(block, block_type)]
                 nodes.append(ParentNode("ul", child_nodes))
             case BlockType.OLIST:
-                child_nodes = [LeafNode("li", node) for node in nodes.split("\n")]
+                child_nodes = [LeafNode("li", node) for node in block_to_html(block, block_type)]
                 nodes.append(ParentNode("ol", child_nodes))
+    return ParentNode("div", nodes)
