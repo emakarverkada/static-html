@@ -116,5 +116,8 @@ def text_node_to_html_node(text_node):
             raise ValueError(f"Invalid text type: {text_node.text_type}")
 
 
-def line_to_html_nodes(line):
-    return [text_node_to_html_node(node) for node in text_to_textnodes(line)]
+def lines_to_html_nodes(lines):
+    nodes = [text_to_textnodes(l) for l in lines]
+    #flatten list
+    nodes = [x for node in nodes for x in node]
+    return [text_node_to_html_node(node) for node in nodes]
