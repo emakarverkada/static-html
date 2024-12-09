@@ -35,40 +35,13 @@ def block_to_block_type(text):
     else:
         return BlockType.PARAGRAPH
 
-def block_to_html(block, block_type):
+def block_to_children(block):
+    textnodes = text_to_textnodes(block)
+    return [text_node_to_html_node(textnode) for textnode in textnodes]
+
+def remove_headings(block, heading):
     text = block.split("\n")
-    #text = block
-    match block_type:
-        case BlockType.PARAGRAPH:
-            raw_lines = text
-            return [ParentNode("p", lines_to_html_nodes([l])) for l in raw_lines]
-        case BlockType.HEADING:
-            n = text[0].split(" ")[0].count("#")
-            raw_lines = [re.sub(r"^#{1,6} ", "", l) for l in text]
-            raw_lines = [x for x in raw_lines if x]
-            return [ParentNode(f"h{n}", lines_to_html_nodes([l])) for l in raw_lines]
-        case BlockType.QUOTE:
-            raw_lines = [re.sub(r"^>", "", l) for l in text]
-            raw_lines = [x for x in raw_lines if x]
-            return [ParentNode("blockquote", lines_to_html_nodes([l])) for l in raw_lines]
-        case BlockType.CODE:
-            raw_lines = [re.sub(r"^`{3}", "", l) for l in text]
-            raw_lines = [x for x in raw_lines if x]
-            #return [ParentNode("code", lines_to_html_nodes([l])) for l in raw_lines]
-            return ParentNode("code", lines_to_html_nodes(raw_lines)) 
-        case BlockType.UNLIST:
-            raw_lines = [re.sub(r"^\*|- ", "", l) for l in text]
-            raw_lines = [x for x in raw_lines if x]
-            child_nodes = [ParentNode("li", lines_to_html_nodes([l])) for l in raw_lines]
-            return ParentNode("ul", child_nodes)
-        case BlockType.OLIST:
-            raw_lines = [re.sub(r"^\d+. ", "", l) for l in text]
-            raw_lines = [x for x in raw_lines if x]
-            child_nodes = [ParentNode("li", lines_to_html_nodes([l])) for l in raw_lines]
-            return ParentNode("ol", child_nodes)
-        case _:
-            raise ValueError("Please provide a valid block type")
-               
+    return [line.lstrip(heading) for line in text]
 
 def markdown_to_html_node(text):
     text = markdown_to_blocks(text)
@@ -77,17 +50,17 @@ def markdown_to_html_node(text):
         block_type = block_to_block_type(block)
         match block_type:
             case BlockType.PARAGRAPH:
-                nodes.append(ParentNode("p",children=block_to_html(block, block_type)))
+                nodes.append(ParentNode("p",children = block_to_children(" ".join(remove_headings(block,"")))))
             case BlockType.HEADING:
-                nodes.append(ParentNode(f"h{block[5].count("#")}",children=block_to_html(block, block_type)))
+                nodes.append(ParentNode(f"h{block[:5].count("#")}",children = block_to_children(" ".join(remove_headings(block, "# ")))))
             case BlockType.QUOTE:
-                nodes.append(ParentNode("blockquote", children=block_to_html(block, block_type)))
+                nodes.append(ParentNode("blockquote", children = block_to_children(" ".join(remove_headings(block, "> ")))))
             case BlockType.CODE:
-                nodes.append(HTMLNode("code", children=block_to_html(block, block_type)))
+                nodes.append(HTMLNode("code", children = " ".join(block_to_children(block[1:-2]))))
             case BlockType.UNLIST:
-                child_nodes = [LeafNode("li", node) for node in block_to_html(block, block_type)]
+                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "-* ")]]
                 nodes.append(ParentNode("ul", child_nodes))
             case BlockType.OLIST:
-                child_nodes = [LeafNode("li", node) for node in block_to_html(block, block_type)]
+                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "1234567890. ")]]
                 nodes.append(ParentNode("ol", child_nodes))
     return ParentNode("div", nodes)
