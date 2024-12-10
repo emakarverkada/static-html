@@ -1,8 +1,7 @@
-from textnode import *
+from files import *
 
 def main():
-    dummy = TextNode("This is a text node",TextType.bold,"vk.com")
-    print(dummy)
+    pass
 
 if __name__ == "__main__":
     main()
