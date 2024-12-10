@@ -18,7 +18,7 @@ def block_to_block_type(text):
     heading_regex = r"(?m)^#{1,6} .+" #every line starts with
     code_regex = r"^`{3}[\S\s]*?`{3}$" #first and last line equal to
     quote_rexex = r"(?m)^>.*"#matches should = number of lines
-    unordered_regex = r"(?m)^\*|- .+"#every line starts with
+    unordered_regex = r"(?m)^(\*|-) .+"#every line starts with
     #x=1
     #ordered_regex = rf"^{x}+\. " #every line starts with + increments
     x = re.findall(heading_regex, text)
@@ -56,9 +56,11 @@ def markdown_to_html_node(markdown):
             case BlockType.QUOTE:
                 nodes.append(ParentNode("blockquote", children = block_to_children(" ".join(remove_headings(block, "> ")))))
             case BlockType.CODE:
-                nodes.append(HTMLNode("code", children = " ".join(block_to_children(block[1:-2]))))
+                nodes.append(ParentNode("code", children = block_to_children(block.replace('```',''))))
             case BlockType.UNLIST:
-                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "-* ")]]
+                #need to limit to one replacement
+                # child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "-* ")]]
+                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in re.sub(r"^(\*|-) ", block, "", flags=re.MULTILINE).split()]]
                 nodes.append(ParentNode("ul", child_nodes))
             case BlockType.OLIST:
                 child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "1234567890. ")]]

@@ -15,5 +15,23 @@ def generate_page(from_path, template_path, dest_path):
     html = markdown_to_html_node(md).to_html()
     title = extract_title(md)
     new_page = template.replace("{{ Title }}",title).replace("{{ Content }}", html)
-    os.makedirs(dest_path, exist_ok=True)
+    #os.scandir(dest_path)
+    #os.makedirs(dest_path, exist_ok=True)
     with open(dest_path, "w") as f: f.write(new_page)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    content = os.walk(dir_path_content)
+    for path, dirs, files in content:
+        for file in files:
+            if file.endswith(".md"):
+                file = file.replace(".md",".html")
+                new_file_path = path.replace(dir_path_content, dest_dir_path)
+                os.makedirs(new_file_path, exist_ok=True)
+                generate_page(f"{path}/{file}", template_path, f"{new_file_path}/{file}")
+
+# def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+#     content = os.walk(dir_path_content)
+#     for root, dirs, files in content: 
+#         print(f"{root} | {dirs} | {files}")
+
+generate_pages_recursive("content", "template.html", "public")
