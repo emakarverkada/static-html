@@ -1,8 +1,6 @@
 import os
 import shutil
 
-#shutil.copy()
-
-x = os.scandir(".")
-for file in x:
-    print(file.name)
+def cp_directory(from_path, dest_path):
+    shutil.rmtree(dest_path)
+    shutil.copytree(from_path, dest_path)

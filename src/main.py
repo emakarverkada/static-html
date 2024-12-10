@@ -1,7 +1,7 @@
 from files import *
 
 def main():
-    pass
+    cp_directory("static", "public")
 
 if __name__ == "__main__":
     main()

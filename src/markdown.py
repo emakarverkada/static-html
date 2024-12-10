@@ -43,8 +43,8 @@ def remove_headings(block, heading):
     text = block.split("\n")
     return [line.lstrip(heading) for line in text]
 
-def markdown_to_html_node(text):
-    text = markdown_to_blocks(text)
+def markdown_to_html_node(markdown):
+    text = markdown_to_blocks(markdown)
     nodes = []
     for block in text:
         block_type = block_to_block_type(block)
@@ -64,3 +64,9 @@ def markdown_to_html_node(text):
                 child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "1234567890. ")]]
                 nodes.append(ParentNode("ol", child_nodes))
     return ParentNode("div", nodes)
+
+def extract_title(markdown):
+    title = re.findall(r"^# .*?$", markdown, re.MULTILINE)
+    if title:
+        return title[0].strip("# ")
+    raise Exception("No h1 title in string")
