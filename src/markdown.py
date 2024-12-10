@@ -60,10 +60,10 @@ def markdown_to_html_node(markdown):
             case BlockType.UNLIST:
                 #need to limit to one replacement
                 # child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "-* ")]]
-                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in re.sub(r"^(\*|-) ", block, "", flags=re.MULTILINE).split()]]
+                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in re.sub(r"^(\*|-) ", "", block, flags=re.MULTILINE).split("\n")]]
                 nodes.append(ParentNode("ul", child_nodes))
             case BlockType.OLIST:
-                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in remove_headings(block, "1234567890. ")]]
+                child_nodes = [ParentNode("li", node) for node in [block_to_children(x) for x in re.sub(r"^\d*\. ", "", block, flags=re.MULTILINE).split("\n")]]
                 nodes.append(ParentNode("ol", child_nodes))
     return ParentNode("div", nodes)
 

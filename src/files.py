@@ -24,10 +24,9 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
     for path, dirs, files in content:
         for file in files:
             if file.endswith(".md"):
-                file = file.replace(".md",".html")
                 new_file_path = path.replace(dir_path_content, dest_dir_path)
                 os.makedirs(new_file_path, exist_ok=True)
-                generate_page(f"{path}/{file}", template_path, f"{new_file_path}/{file}")
+                generate_page(f"{path}/{file}", template_path, f"{new_file_path}/{file.replace(".md",".html")}")
 
 # def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
 #     content = os.walk(dir_path_content)
